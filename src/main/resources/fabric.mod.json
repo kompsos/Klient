@@ -1,0 +1,31 @@
+{
+	"schemaVersion": 1,
+	"id": "klient",
+	"version": "${version}",
+	"name": "Klient",
+	"description": "Minecraft Client for Kaboom based minecraft servers based around Free Operator",
+	"authors": [
+		"Kompsos"
+	],
+	"contact": {
+		"homepage": "https://fabricmc.net/",
+		"sources": "https://github.com/FabricMC/fabric-example-mod"
+	},
+	"license": "CC0-1.0",
+	"icon": "assets/klient/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"com.kompsos.Klient"
+		]
+	},
+	"mixins": [
+		"klient.mixins.json"
+	],
+	"depends": {
+		"fabricloader": ">=0.19.5",
+		"minecraft": "~26.3",
+		"java": ">=25",
+		"fabric-api": "*"
+	}
+}
