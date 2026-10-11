@@ -11,9 +11,7 @@ public class ExampleModule extends Module {
     }
 
     @Override
-    public void onTick() {
-        infoLog("Ticking");
-    }
+    public void onTick() {}
 
     @Override
     public void worldClose() {
