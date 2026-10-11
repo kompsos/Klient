@@ -1,6 +1,7 @@
 package com.kompsos.system.core.moduleloader;
 
 import com.kompsos.Klient;
+import com.kompsos.system.core.config.KlientConfig;
 import net.minecraft.resources.Identifier;
 
 public class Module {
@@ -23,6 +24,9 @@ public class Module {
         return this.id;
     }
 
+    public KlientConfig config() {
+        return Klient.getConfig();
+    }
     public void execute() {}
     public void onTick() {}
     public void worldOpen() {}

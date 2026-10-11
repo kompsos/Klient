@@ -5,72 +5,86 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 
-import java.util.Arrays;
-import java.util.Iterator;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ModuleManager {
     private final Module[] modules;
     private final ExecutorService main = Executors.newSingleThreadExecutor();
     private final ExecutorService multi = Executors.newCachedThreadPool();
 
+    private boolean worldLoaded;
+
     public ModuleManager(Module... modules) {
         this.modules = modules;
     }
 
     public void load() {
-        AtomicBoolean worldLoaded = new AtomicBoolean(false);
+        ClientLifecycleEvents.CLIENT_STARTED.register(_ -> {
+            for (Module module : modules) {
+                execute(module, module::clientReady);
+                Klient.LOGGER.info(
+                        "{} loaded as {}",
+                        module.getId().getPath(),
+                        module.getExecutorMode()
+                );
+            }
+        });
 
-        ClientLifecycleEvents.CLIENT_STARTED.register(_ -> moduleIterator().forEachRemaining(module -> {
-            switch (module.getExecutorMode()) {
-                case MULTI -> multi.execute(module::clientReady);
-                case SINGLE_MAIN -> main.execute(module::clientReady);
+        ClientLifecycleEvents.CLIENT_STOPPING.register(_ -> {
+            closeWorldIfLoaded();
+
+            for (Module module : modules) {
+                execute(module, module::clientClosing);
             }
 
-            Klient.LOGGER.info("{} loaded as {}", module.getId().getPath(), module.getExecutorMode());
-        }));
+            multi.shutdown();
+            main.shutdown();
+        });
 
-        ClientLifecycleEvents.CLIENT_STOPPING.register(_ -> moduleIterator().forEachRemaining(module -> {
-            switch (module.getExecutorMode()) {
-                case MULTI -> multi.execute(module::clientClosing);
-                case SINGLE_MAIN -> main.execute(module::clientClosing);
-            }
-        }));
+        ClientPlayConnectionEvents.DISCONNECT.register((_, _) -> {
+            closeWorldIfLoaded();
+        });
 
-        ClientPlayConnectionEvents.DISCONNECT.register((_, _) -> moduleIterator().forEachRemaining(module -> {
-            if (worldLoaded.get()) {
-                switch (module.getExecutorMode()) {
-                    case MULTI -> multi.execute(module::worldClose);
-                    case SINGLE_MAIN -> main.execute(module::worldClose);
+        ClientTickEvents.END_CLIENT_TICK.register(client -> {
+            boolean hasWorld = client.player != null;
+
+            if (hasWorld && !worldLoaded) {
+                worldLoaded = true;
+
+                for (Module module : modules) {
+                    execute(module, module::worldOpen);
                 }
-
-                worldLoaded.set(false);
-            }
-        }));
-
-        ClientTickEvents.END_LEVEL_TICK.register(_ -> moduleIterator().forEachRemaining(module -> {
-            switch (module.getExecutorMode()) {
-                case MULTI -> multi.execute(module::onTick);
-                case SINGLE_MAIN -> main.execute(module::onTick);
+            } else if (!hasWorld && worldLoaded) {
+                closeWorldIfLoaded();
             }
 
-            if (!worldLoaded.get()) {
-                switch (module.getExecutorMode()) {
-                    case MULTI -> multi.execute(module::worldOpen);
-                    case SINGLE_MAIN -> main.execute(module::worldOpen);
+            if (hasWorld) {
+                for (Module module : modules) {
+                    execute(module, module::onTick);
                 }
-
-                worldLoaded.set(true);
             }
-        }));
+        });
     }
 
-    private Iterator<Module> moduleIterator() {
-        return Arrays.stream(modules).iterator();
+    private void closeWorldIfLoaded() {
+        if (!worldLoaded) {
+            return;
+        }
+
+        worldLoaded = false;
+
+        for (Module module : modules) {
+            execute(module, module::worldClose);
+        }
     }
 
+    private void execute(Module module, Runnable task) {
+        switch (module.getExecutorMode()) {
+            case MULTI -> multi.execute(task);
+            case SINGLE_MAIN -> task.run();
+        }
+    }
 
     public enum ExecutorMode {
         MULTI,
