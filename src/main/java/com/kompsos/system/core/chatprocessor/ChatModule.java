@@ -2,7 +2,7 @@ package com.kompsos.system.core.chatprocessor;
 
 import com.kompsos.Klient;
 import com.kompsos.system.core.moduleloader.Module;
-import com.kompsos.system.core.moduleloader.ModuleManager;
+import com.kompsos.system.core.moduleloader.managers.ModuleManager;
 import net.minecraft.network.protocol.game.ClientboundSystemChatPacket;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 

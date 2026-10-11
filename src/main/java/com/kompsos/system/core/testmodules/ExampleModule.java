@@ -2,8 +2,7 @@ package com.kompsos.system.core.testmodules;
 
 import com.kompsos.Klient;
 import com.kompsos.system.core.moduleloader.Module;
-import com.kompsos.system.core.moduleloader.ModuleManager;
-import net.minecraft.resources.Identifier;
+import com.kompsos.system.core.moduleloader.managers.ModuleManager;
 
 public class ExampleModule extends Module {
     public ExampleModule() {

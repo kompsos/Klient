@@ -1,6 +1,7 @@
-package com.kompsos.system.core.moduleloader;
+package com.kompsos.system.core.moduleloader.managers;
 
 import com.kompsos.Klient;
+import com.kompsos.system.core.moduleloader.Module;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
@@ -9,19 +10,19 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class ModuleManager {
-    private final Module[] modules;
+    private final com.kompsos.system.core.moduleloader.Module[] modules;
     private final ExecutorService main = Executors.newSingleThreadExecutor();
     private final ExecutorService multi = Executors.newCachedThreadPool();
 
     private boolean worldLoaded;
 
-    public ModuleManager(Module... modules) {
+    public ModuleManager(com.kompsos.system.core.moduleloader.Module... modules) {
         this.modules = modules;
     }
 
     public void load() {
         ClientLifecycleEvents.CLIENT_STARTED.register(_ -> {
-            for (Module module : modules) {
+            for (com.kompsos.system.core.moduleloader.Module module : modules) {
                 execute(module, module::clientReady);
                 Klient.LOGGER.info(
                         "{} loaded as {}",
@@ -34,7 +35,7 @@ public class ModuleManager {
         ClientLifecycleEvents.CLIENT_STOPPING.register(_ -> {
             closeWorldIfLoaded();
 
-            for (Module module : modules) {
+            for (com.kompsos.system.core.moduleloader.Module module : modules) {
                 execute(module, module::clientClosing);
             }
 
@@ -52,7 +53,7 @@ public class ModuleManager {
             if (hasWorld && !worldLoaded) {
                 worldLoaded = true;
 
-                for (Module module : modules) {
+                for (com.kompsos.system.core.moduleloader.Module module : modules) {
                     execute(module, module::worldOpen);
                 }
             } else if (!hasWorld && worldLoaded) {
@@ -60,11 +61,19 @@ public class ModuleManager {
             }
 
             if (hasWorld) {
-                for (Module module : modules) {
+                for (com.kompsos.system.core.moduleloader.Module module : modules) {
                     execute(module, module::onTick);
                 }
             }
+
+            tick();
         });
+    }
+
+    protected void tick() {}
+
+    public Module[] getModules() {
+        return modules;
     }
 
     private void closeWorldIfLoaded() {
@@ -74,7 +83,7 @@ public class ModuleManager {
 
         worldLoaded = false;
 
-        for (Module module : modules) {
+        for (com.kompsos.system.core.moduleloader.Module module : modules) {
             execute(module, module::worldClose);
         }
     }
