@@ -44,7 +44,7 @@ public class ChatSystem extends Module {
     }
 
     public void handleClientsideChatMessage(String msg, boolean addToRecent, CallbackInfo ci) {
-        KlientConfig.Commands commandConfig = new KlientConfig.Commands();
+        KlientConfig.Commands commandConfig = Klient.configLoader.getConfigObject().commands;
 
         if (commandConfig.getCommandsEnabled() && msg.startsWith(commandConfig.getPrefix())) {
             Klient.commandManager.processChatCommand(msg, ci);
@@ -54,6 +54,10 @@ public class ChatSystem extends Module {
     private int cursorIndex = 0;
 
     public void handleAutocomplete(Minecraft instance, int scaledWidth, int scaledHeight, GuiGraphicsExtractor drawContext, Screen screen) {
+        KlientConfig.Commands commandConfig = Klient.configLoader.getConfigObject().commands;
+        if (!commandConfig.getCommandsEnabled())
+            return;
+
         int visibleCommands;
 
         //For autocomplete box
@@ -64,7 +68,7 @@ public class ChatSystem extends Module {
         int width = 225;
         int height;
 
-        KlientConfig.Commands commandConfig = new KlientConfig.Commands();
+
         Command[] commands = (Command[]) Klient.commandManager.getModules();
         ChatComponent chatScreen = instance.gui.hud.getChat();
         EditBox inputBox = ((ChatScreenAccessor) screen).getInput();
@@ -80,7 +84,7 @@ public class ChatSystem extends Module {
                 }
             }
 
-            visibleCommands = Math.clamp(commandsAvailable, 0, commandConfig.getMaxShowedAutocompleteCommands());
+            visibleCommands = Math.clamp(commandsAvailable, 0, commandConfig.getMaxAutoCmds());
             if (visibleCommands == 0)
                 return;
 

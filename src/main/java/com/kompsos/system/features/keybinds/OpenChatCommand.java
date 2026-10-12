@@ -17,6 +17,6 @@ public class OpenChatCommand extends Keybind {
 
     @Override
     public void execute() {
-        Minecraft.getInstance().setScreenAndShow(new ChatScreen(new KlientConfig.Commands().getPrefix(), false));
+        Minecraft.getInstance().setScreenAndShow(new ChatScreen(Klient.configLoader.getConfigObject().commands.getPrefix(), false));
     }
 }

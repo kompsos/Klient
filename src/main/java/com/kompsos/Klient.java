@@ -7,6 +7,7 @@ import com.kompsos.system.core.moduleloader.managers.KeybindManager;
 import com.kompsos.system.core.moduleloader.managers.ModuleManager;
 import com.kompsos.system.core.systemmodules.NotificationSystem;
 import com.kompsos.system.core.testmodules.*;
+import com.kompsos.system.features.keybinds.ConfigMenu;
 import com.kompsos.system.features.keybinds.OpenChatCommand;
 import net.fabricmc.api.ModInitializer;
 
@@ -20,7 +21,7 @@ public class Klient implements ModInitializer {
 	public static final String MOD_ID = "klient";
 	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
-	private static final ConfigLoader configLoader = new ConfigLoader(
+	public static final ConfigLoader configLoader = new ConfigLoader(
 			FabricLoader.getInstance()
 			.getConfigDir()
 			.resolve(MOD_ID)
@@ -33,7 +34,7 @@ public class Klient implements ModInitializer {
 			new ExampleCommand()
 	).load();
 
-	public static KeybindManager keybindManager = (KeybindManager) new KeybindManager(new ExampleKeybind(), new OpenChatCommand()).load();;
+	public static KeybindManager keybindManager = (KeybindManager) new KeybindManager(new ExampleKeybind(), new OpenChatCommand(), new ConfigMenu()).load();;
 	public static ModuleManager moduleManager = new ModuleManager(CHAT_SYSTEM, NOTIFICATION_SYSTEM).load();
 
 	@Override

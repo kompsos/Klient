@@ -9,11 +9,11 @@ public class KlientConfig {
 
     public static class Commands {
         boolean enabled = true;
-        int maxShowedAutocompleteCommands = 5;
+        int maxAutoCmds = 5;
         String commandPrefix = ".";
 
         public boolean getCommandsEnabled() {return enabled;}
         public String getPrefix() {return commandPrefix;}
-        public int getMaxShowedAutocompleteCommands() {return maxShowedAutocompleteCommands;}
+        public int getMaxAutoCmds() {return maxAutoCmds;}
     }
 }
