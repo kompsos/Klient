@@ -4,6 +4,8 @@ import com.kompsos.Klient;
 import com.kompsos.system.core.moduleloader.Command;
 import com.kompsos.system.core.moduleloader.Module;
 import net.minecraft.client.Minecraft;
+import net.minecraft.network.chat.Component;
+import net.minecraft.util.CommonColors;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.ArrayList;
@@ -26,6 +28,8 @@ public class CommandManager extends ModuleManager {
                 return;
             }
         }
+
+        Klient.NOTIFICATION_SYSTEM.push(1500, Component.literal("Unknown command: " + command + "!").withColor(CommonColors.RED));
     }
 
     public Command getCommand(String name) {

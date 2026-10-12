@@ -3,6 +3,7 @@ package com.kompsos.system.core.moduleloader;
 import com.kompsos.Klient;
 import com.kompsos.system.core.config.KlientConfig;
 import com.kompsos.system.core.moduleloader.managers.ModuleManager;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 
 import java.util.ArrayList;
@@ -18,6 +19,7 @@ public abstract class Module {
     public void infoLog(String data) {
         Klient.LOGGER.info("{} <-> {}", getId().getPath(), data);
     }
+    public void notify(Component message, int liveTime) {Klient.NOTIFICATION_SYSTEM.push(liveTime, message);}
 
     public ModuleManager.ExecutorMode getExecutorMode() {
         return this.mode;

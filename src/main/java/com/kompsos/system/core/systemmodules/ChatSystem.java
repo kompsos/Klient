@@ -24,11 +24,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.ArrayList;
 
-public class ChatModule extends Module {
-    private static final Logger log = LoggerFactory.getLogger(ChatModule.class);
+public class ChatSystem extends Module {
+    private static final Logger log = LoggerFactory.getLogger(ChatSystem.class);
 
-    public ChatModule() {
-        super(ModuleManager.ExecutorMode.SINGLE_MAIN, Klient.id("chat_module"));
+    public ChatSystem() {
+        super(ModuleManager.ExecutorMode.SINGLE_MAIN, Klient.id("chat_system"));
     }
 
     @Override

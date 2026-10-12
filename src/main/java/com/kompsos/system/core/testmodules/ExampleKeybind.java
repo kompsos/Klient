@@ -3,6 +3,7 @@ package com.kompsos.system.core.testmodules;
 import com.kompsos.Klient;
 import com.kompsos.system.core.moduleloader.Keybind;
 import com.kompsos.system.core.moduleloader.managers.ModuleManager;
+import net.minecraft.network.chat.Component;
 
 public class ExampleKeybind extends Keybind {
     public ExampleKeybind() {
@@ -11,6 +12,6 @@ public class ExampleKeybind extends Keybind {
 
     @Override
     public void execute() {
-        infoLog("keybind pressed");
+        notify(Component.literal("test for the notification system so this should be a rather long text"), 20 * 4);
     }
 }
