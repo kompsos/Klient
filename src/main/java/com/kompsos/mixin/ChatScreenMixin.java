@@ -11,7 +11,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class ChatScreenMixin {
     @Inject(at = @At("HEAD"), method = "handleChatInput", cancellable = true)
     public void handleChatInput(String msg, boolean addToRecent, CallbackInfo ci) {
-        Klient.CHAT_SYSTEM.handleClientsideChatMessage(msg, addToRecent, ci);
+        Klient.CHAT_SYSTEM.handleClientsideChatMessage(msg, ci);
     }
 
 

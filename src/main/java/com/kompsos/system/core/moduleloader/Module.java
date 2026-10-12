@@ -1,7 +1,6 @@
 package com.kompsos.system.core.moduleloader;
 
 import com.kompsos.Klient;
-import com.kompsos.system.core.config.KlientConfig;
 import com.kompsos.system.core.moduleloader.managers.ModuleManager;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;

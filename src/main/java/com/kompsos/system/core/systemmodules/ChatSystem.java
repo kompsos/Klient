@@ -18,14 +18,11 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundSystemChatPacket;
 import net.minecraft.util.CommonColors;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.ArrayList;
 
 public class ChatSystem extends Module {
-    private static final Logger log = LoggerFactory.getLogger(ChatSystem.class);
 
     public ChatSystem() {
         super(ModuleManager.ExecutorMode.SINGLE_MAIN, Klient.id("chat_system"));
@@ -36,14 +33,12 @@ public class ChatSystem extends Module {
         ScreenEvents.AFTER_INIT.register((client, screen, scaledWidth, scaledHeight) -> {
             // If the screen is the active Chat Input screen, hook into its render pass
             if (screen instanceof ChatScreen) {
-                ScreenEvents.afterExtract(screen).register((chatScreen, guiGraphicsExtractor, _, _, _) -> {
-                    handleAutocomplete(client, scaledWidth, scaledHeight, guiGraphicsExtractor, chatScreen);
-                });
+                ScreenEvents.afterExtract(screen).register((chatScreen, guiGraphicsExtractor, _, _, _) -> handleAutocomplete(client, scaledWidth, scaledHeight, guiGraphicsExtractor, chatScreen));
             }
         });
     }
 
-    public void handleClientsideChatMessage(String msg, boolean addToRecent, CallbackInfo ci) {
+    public void handleClientsideChatMessage(String msg, CallbackInfo ci) {
         KlientConfig.Commands commandConfig = Klient.configLoader.getConfigObject().commands;
 
         if (commandConfig.getCommandsEnabled() && msg.startsWith(commandConfig.getPrefix())) {
@@ -51,7 +46,7 @@ public class ChatSystem extends Module {
         }
     }
 
-    private int cursorIndex = 0;
+    private final int cursorIndex = 0;
 
     public void handleAutocomplete(Minecraft instance, int scaledWidth, int scaledHeight, GuiGraphicsExtractor drawContext, Screen screen) {
         KlientConfig.Commands commandConfig = Klient.configLoader.getConfigObject().commands;

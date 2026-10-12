@@ -1,4 +1,4 @@
-package com.kompsos.system.core.testmodules;
+package com.kompsos.system.features.commands;
 
 import com.kompsos.Klient;
 import com.kompsos.system.core.moduleloader.Command;

@@ -4,8 +4,6 @@ import com.kompsos.system.core.moduleloader.managers.ModuleManager;
 import net.minecraft.resources.Identifier;
 import org.lwjgl.sdl.SDLKeycode;
 
-import java.util.ArrayList;
-
 public class Keybind extends Module {
     private int key = SDLKeycode.SDLK_UNKNOWN;
     public Keybind(ModuleManager.ExecutorMode mode, Identifier id) {

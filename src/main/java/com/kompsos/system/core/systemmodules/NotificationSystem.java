@@ -54,15 +54,15 @@ public class NotificationSystem extends Module {
         HudElementRegistry.attachElementBefore(
                 VanillaHudElements.CHAT,
                 Klient.id("notification_system_hud"),
-                (graphicsExtractor, deltaTracker) -> {
+                (graphicsExtractor, _) -> {
                     if (Minecraft.getInstance().gui.screen() == null) {
                         renderNotifications(graphicsExtractor);
                     }
                 }
         );
 
-        ScreenEvents.AFTER_INIT.register((client, screen, scaledWidth, scaledHeight) ->
-                ScreenEvents.afterExtract(screen).register((screen1, graphicsExtractor, mouseX, mouseY, partialTick) ->
+        ScreenEvents.AFTER_INIT.register((_, screen, _, _) ->
+                ScreenEvents.afterExtract(screen).register((_, graphicsExtractor, _, _, _) ->
                         renderNotifications(graphicsExtractor)
                 )
         );
@@ -74,22 +74,7 @@ public class NotificationSystem extends Module {
         for (int i = 0; i < notifications.size(); i++) {
             Notification notification = notifications.get(i);
 
-            float progress = notification.elapsedTimeMs;
-            float eased;
-
-            if (progress < ANIMATION_TIME_MS) {
-                eased = (float) MathUtil.easeOutCubic(progress / ANIMATION_TIME_MS);
-            } else if (progress < notification.totalTime + ANIMATION_TIME_MS) {
-                eased = 1.0f;
-            } else {
-                float exitProgress = (progress - notification.totalTime - ANIMATION_TIME_MS)
-                        / ANIMATION_TIME_MS;
-                eased = 1.0f - (float) MathUtil.easeOutCubic(exitProgress);
-            }
-
-            eased = Math.clamp(eased, 0.0f, 1.0f);
-
-            int x = (int) (SCREEN_PADDING - NOTIFICATION_WIDTH * (1.07f - eased));
+            int x = getX(notification);
             int y = SCREEN_PADDING + i * (NOTIFICATION_HEIGHT + 5);
 
             int width = x + NOTIFICATION_WIDTH;
@@ -128,6 +113,25 @@ public class NotificationSystem extends Module {
         }
     }
 
+    private static int getX(Notification notification) {
+        float progress = notification.elapsedTimeMs;
+        float eased;
+
+        if (progress < ANIMATION_TIME_MS) {
+            eased = (float) MathUtil.easeOutCubic(progress / ANIMATION_TIME_MS);
+        } else if (progress < notification.totalTime + ANIMATION_TIME_MS) {
+            eased = 1.0f;
+        } else {
+            float exitProgress = (progress - notification.totalTime - ANIMATION_TIME_MS)
+                    / ANIMATION_TIME_MS;
+            eased = 1.0f - (float) MathUtil.easeOutCubic(exitProgress);
+        }
+
+        eased = Math.clamp(eased, 0.0f, 1.0f);
+
+        return (int) (SCREEN_PADDING - NOTIFICATION_WIDTH * (1.07f - eased));
+    }
+
     public void push(int liveTime, Component message) {
         notifications.add(new Notification(liveTime, 0, message));
     }
@@ -143,23 +147,9 @@ public class NotificationSystem extends Module {
             this.message = message;
         }
 
-        public int getElapsedTimeMs() {
-            return elapsedTimeMs;
-        }
-
-        public void setElapsedTimeMs(int elapsedTimeMs) {
-            this.elapsedTimeMs = elapsedTimeMs;
-        }
-
         public Component getMessage() {
             return message;
         }
 
-        public int getTotalTime() {
-            return totalTime;
-        }
-
-        public void setTotalTime(int totalTime) {
-        }
     }
 }

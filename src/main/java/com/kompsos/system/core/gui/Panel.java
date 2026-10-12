@@ -9,6 +9,7 @@ import net.minecraft.client.input.CharacterEvent;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
+import org.jspecify.annotations.NonNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -118,7 +119,7 @@ public class Panel extends AbstractWidget {
     }
 
     @Override
-    protected void onDrag(MouseButtonEvent event, double dx, double dy) {
+    protected void onDrag(@NonNull MouseButtonEvent event, double dx, double dy) {
         if (active != null) {
             active.drag(event.x());
         } else if (draggable) {
@@ -128,20 +129,20 @@ public class Panel extends AbstractWidget {
     }
 
     @Override
-    public void onRelease(MouseButtonEvent event) {
+    public void onRelease(@NonNull MouseButtonEvent event) {
         grabbed = false;
     }
 
     @Override
-    public boolean keyPressed(KeyEvent event) {
+    public boolean keyPressed(@NonNull KeyEvent event) {
         return active != null && active.key(event);
     }
 
     @Override
-    public boolean charTyped(CharacterEvent event) {
+    public boolean charTyped(@NonNull CharacterEvent event) {
         return active != null && active.chr(event);
     }
 
     @Override
-    protected void updateWidgetNarration(NarrationElementOutput output) {}
+    protected void updateWidgetNarration(@NonNull NarrationElementOutput output) {}
 }

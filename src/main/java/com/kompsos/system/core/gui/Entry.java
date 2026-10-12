@@ -106,6 +106,10 @@ public abstract class Entry {
     public static class Toggle extends Entry {
         private final ToggleModule module;
 
+        public ToggleModule getModule() {
+            return module;
+        }
+
         public Toggle(ToggleModule module) {
             super(module.getId().getPath());
             this.module = module;

@@ -10,7 +10,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class ModuleManager {
-    private final com.kompsos.system.core.moduleloader.Module[] modules;
+    protected com.kompsos.system.core.moduleloader.Module[] modules;
     private final ExecutorService main = Executors.newSingleThreadExecutor();
     private final ExecutorService multi = Executors.newCachedThreadPool();
 
@@ -43,9 +43,7 @@ public class ModuleManager {
             main.shutdown();
         });
 
-        ClientPlayConnectionEvents.DISCONNECT.register((_, _) -> {
-            closeWorldIfLoaded();
-        });
+        ClientPlayConnectionEvents.DISCONNECT.register((_, _) -> closeWorldIfLoaded());
 
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             boolean hasWorld = client.player != null;
