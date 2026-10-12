@@ -1,17 +1,18 @@
 {
-	"required": true,
-	"package": "com.kompsos.mixin",
-	"compatibilityLevel": "JAVA_25",
-	"mixins": [
-		"ChatScreenMixin"
-	],
-	"injectors": {
-		"defaultRequire": 1
-	},
-	"overwrites": {
-		"requireAnnotations": true
-	},
-	"client": [
-		"ClientPacketListenerMixin"
-	]
+  "required": true,
+  "package": "com.kompsos.mixin",
+  "compatibilityLevel": "JAVA_25",
+  "mixins": [
+    "ChatScreenMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "overwrites": {
+    "requireAnnotations": true
+  },
+  "client": [
+    "ChatScreenAccessor",
+    "ClientPacketListenerMixin"
+  ]
 }

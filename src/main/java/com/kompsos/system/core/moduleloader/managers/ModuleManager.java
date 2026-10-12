@@ -20,7 +20,7 @@ public class ModuleManager {
         this.modules = modules;
     }
 
-    public void load() {
+    public ModuleManager load() {
         ClientLifecycleEvents.CLIENT_STARTED.register(_ -> {
             for (com.kompsos.system.core.moduleloader.Module module : modules) {
                 execute(module, module::clientReady);
@@ -68,6 +68,8 @@ public class ModuleManager {
 
             tick();
         });
+
+        return this;
     }
 
     protected void tick() {}

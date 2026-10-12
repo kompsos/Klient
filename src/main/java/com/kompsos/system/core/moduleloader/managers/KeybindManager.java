@@ -19,7 +19,7 @@ public class KeybindManager extends ModuleManager {
     }
 
     @Override
-    public void load() {
+    public ModuleManager load() {
         super.load();
 
         for (Keybind module : (Keybind[]) getModules()) {
@@ -30,6 +30,7 @@ public class KeybindManager extends ModuleManager {
                         )
                 ));
         }
+        return null;
     }
 
     @Override

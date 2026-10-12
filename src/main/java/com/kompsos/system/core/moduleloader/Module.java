@@ -5,7 +5,9 @@ import com.kompsos.system.core.config.KlientConfig;
 import com.kompsos.system.core.moduleloader.managers.ModuleManager;
 import net.minecraft.resources.Identifier;
 
-public class Module {
+import java.util.ArrayList;
+
+public abstract class Module {
     private final ModuleManager.ExecutorMode mode;
     private final Identifier id;
     public Module(ModuleManager.ExecutorMode mode, Identifier id) {
@@ -25,13 +27,12 @@ public class Module {
         return this.id;
     }
 
-    public KlientConfig config() {
-        return Klient.getConfig();
-    }
     public void execute() {}
     public void onTick() {}
     public void worldOpen() {}
     public void worldClose() {}
     public void clientReady() {}
     public void clientClosing() {}
+
+    public void execute(ArrayList<String> arguments) {}
 }

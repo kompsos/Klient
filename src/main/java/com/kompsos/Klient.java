@@ -5,10 +5,10 @@ import com.kompsos.system.core.config.ConfigLoader;
 import com.kompsos.system.core.config.KlientConfig;
 import com.kompsos.system.core.moduleloader.Keybind;
 import com.kompsos.system.core.moduleloader.Module;
+import com.kompsos.system.core.moduleloader.managers.CommandManager;
 import com.kompsos.system.core.moduleloader.managers.KeybindManager;
 import com.kompsos.system.core.moduleloader.managers.ModuleManager;
-import com.kompsos.system.core.testmodules.ExampleKeybind;
-import com.kompsos.system.core.testmodules.ExampleModule;
+import com.kompsos.system.core.testmodules.*;
 import net.fabricmc.api.ModInitializer;
 
 import net.fabricmc.loader.api.FabricLoader;
@@ -22,26 +22,25 @@ public class Klient implements ModInitializer {
 	public static final String MOD_ID = "klient";
 	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
-	private static ConfigLoader configLoader = new ConfigLoader(
+	private static final ConfigLoader configLoader = new ConfigLoader(
 			FabricLoader.getInstance()
 			.getConfigDir()
 			.resolve(MOD_ID)
 			.resolve("config.json"));
 
-	private static Module[] coreModules = {new ChatModule()};
-	private static Module[] exampleModules = {new ExampleModule()};
+	public static final ChatModule chatModule = new ChatModule();
+
+	public static CommandManager commandManager = (CommandManager) new CommandManager(
+			new ExampleCommand()
+	).load();
+
+	public static KeybindManager keybindManager = (KeybindManager) new KeybindManager(new ExampleKeybind()).load();;
+	public static ModuleManager moduleManager = new ModuleManager(chatModule, new ExampleModule()).load();
 
 	@Override
 	public void onInitialize() {
 		LOGGER.info("Hello Kaboom!");
-		new ModuleManager(ArrayUtils.addAll(coreModules, exampleModules)).load();
-		new KeybindManager(new ExampleKeybind()).load();
-
 		configLoader.load();
-	}
-
-	public static KlientConfig getConfig() {
-		return configLoader.getConfigObject();
 	}
 
 	public static Identifier id(String path) {
