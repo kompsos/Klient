@@ -1,4 +1,4 @@
-package com.kompsos.system.core.chatprocessor;
+package com.kompsos.system.core.systemmodules;
 
 import com.kompsos.Klient;
 import com.kompsos.mixin.ChatScreenAccessor;
@@ -8,31 +8,25 @@ import com.kompsos.system.core.moduleloader.Module;
 import com.kompsos.system.core.moduleloader.managers.ModuleManager;
 import com.kompsos.system.lib.ClientColors;
 import com.kompsos.system.lib.GraphicsUtil;
-import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElement;
-import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
-import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
-import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.ChatComponent;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.ChatScreen;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.input.KeyEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundSystemChatPacket;
-import net.minecraft.util.ARGB;
 import net.minecraft.util.CommonColors;
-import org.joml.Matrix3x2f;
-import org.lwjgl.sdl.SDLKeycode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.nio.FloatBuffer;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class ChatModule extends Module {
+    private static final Logger log = LoggerFactory.getLogger(ChatModule.class);
+
     public ChatModule() {
         super(ModuleManager.ExecutorMode.SINGLE_MAIN, Klient.id("chat_module"));
     }
@@ -61,9 +55,11 @@ public class ChatModule extends Module {
 
     public void handleAutocomplete(Minecraft instance, int scaledWidth, int scaledHeight, GuiGraphicsExtractor drawContext, Screen screen) {
         int visibleCommands;
-        int color = ARGB.color((int) (255 / 1.125),12,12,12);
+
+        //For autocomplete box
+        int color = ClientColors.backgroundColor;
         int elementX = 3;
-        int elementY = scaledHeight - 15;
+        int elementY = scaledHeight - 16;
         int textPadding = 2;
         int width = 225;
         int height;
@@ -86,13 +82,50 @@ public class ChatModule extends Module {
 
             visibleCommands = Math.clamp(commandsAvailable, 0, commandConfig.getMaxShowedAutocompleteCommands());
             if (visibleCommands == 0)
-                return;;
+                return;
 
             namedCommandsArray.set(cursorIndex, namedCommandsArray.get(cursorIndex).copy().withColor(ClientColors.selectedText));
             height = -(instance.font.lineHeight + textPadding) * visibleCommands;
 
             drawContext.fill(elementX, elementY, elementX + width, elementY + height, color);
+            drawContext.outline(elementX, elementY, width, height, CommonColors.WHITE);
             GraphicsUtil.drawTextList(instance.font, drawContext, elementX + textPadding, elementY + height + textPadding, CommonColors.WHITE, textPadding, namedCommandsArray.toArray(new Component[commandsAvailable]));
+
+            drawInfoBox(drawContext, scaledWidth, scaledHeight, instance, namedCommandsArray.toArray(new Component[commandsAvailable]));
+        }
+    }
+
+    private void drawInfoBox(GuiGraphicsExtractor drawContext, int scaledWidth, int scaledHeight, Minecraft instance, Component[] commandNameList) {
+        int x = scaledWidth - 4;
+        int y = scaledHeight - 16;
+        int width = scaledWidth - 198;
+        int height = scaledHeight - 100;
+
+        int boxWidth = 195;
+        int boxHeight = 85;
+        int textX = width + 2;
+        int textY = height + 2;
+        int textWidth = boxWidth - 6;
+
+        drawContext.fill(x, y, width, height, ClientColors.backgroundColor);
+        drawContext.outline(x - 1, height - 1, -193, boxHeight, ClientColors.selectedText);
+        drawContext.horizontalLine(x - 1, width, height + instance.font.lineHeight + 2, ClientColors.selectedText);
+
+        drawContext.text(
+                instance.font, commandNameList[cursorIndex], textX, textY, CommonColors.WHITE);
+
+        Component description = Component.literal(Klient.commandManager
+                .getCommand(commandNameList[cursorIndex].getString())
+                .getDescription());
+
+        int descriptionY = textY + 12;
+        int availableHeight = boxHeight - 12;
+        int maxLines = availableHeight / instance.font.lineHeight;
+
+        var lines = instance.font.split(description, textWidth);
+
+        for (int i = 0; i < Math.min(lines.size(), maxLines); i++) {
+            drawContext.text(instance.font, lines.get(i), textX, descriptionY + i * instance.font.lineHeight, CommonColors.WHITE);
         }
     }
 

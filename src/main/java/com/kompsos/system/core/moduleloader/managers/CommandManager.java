@@ -1,6 +1,8 @@
 package com.kompsos.system.core.moduleloader.managers;
 
+import com.kompsos.Klient;
 import com.kompsos.system.core.moduleloader.Command;
+import com.kompsos.system.core.moduleloader.Module;
 import net.minecraft.client.Minecraft;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
@@ -24,5 +26,14 @@ public class CommandManager extends ModuleManager {
                 return;
             }
         }
+    }
+
+    public Command getCommand(String name) {
+        for (Module module : getModules()) {
+            if (module.getId().getPath().equals(name))
+                return (Command) module;
+        }
+
+        return new Command(ExecutorMode.MULTI, Klient.id("null"));
     }
 }

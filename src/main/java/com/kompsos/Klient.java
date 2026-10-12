@@ -1,20 +1,17 @@
 package com.kompsos;
 
-import com.kompsos.system.core.chatprocessor.ChatModule;
+import com.kompsos.system.core.systemmodules.ChatModule;
 import com.kompsos.system.core.config.ConfigLoader;
-import com.kompsos.system.core.config.KlientConfig;
-import com.kompsos.system.core.moduleloader.Keybind;
-import com.kompsos.system.core.moduleloader.Module;
 import com.kompsos.system.core.moduleloader.managers.CommandManager;
 import com.kompsos.system.core.moduleloader.managers.KeybindManager;
 import com.kompsos.system.core.moduleloader.managers.ModuleManager;
 import com.kompsos.system.core.testmodules.*;
+import com.kompsos.system.features.keybinds.OpenChatCommand;
 import net.fabricmc.api.ModInitializer;
 
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.resources.Identifier;
 
-import org.apache.commons.lang3.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,10 +28,12 @@ public class Klient implements ModInitializer {
 	public static final ChatModule chatModule = new ChatModule();
 
 	public static CommandManager commandManager = (CommandManager) new CommandManager(
-			new ExampleCommand()
+			new ExampleCommand(),
+			new ChatCommand(),
+			new BlankCommand()
 	).load();
 
-	public static KeybindManager keybindManager = (KeybindManager) new KeybindManager(new ExampleKeybind()).load();;
+	public static KeybindManager keybindManager = (KeybindManager) new KeybindManager(new ExampleKeybind(), new OpenChatCommand()).load();;
 	public static ModuleManager moduleManager = new ModuleManager(chatModule, new ExampleModule()).load();
 
 	@Override

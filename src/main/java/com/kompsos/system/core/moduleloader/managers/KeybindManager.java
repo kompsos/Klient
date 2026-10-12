@@ -26,7 +26,7 @@ public class KeybindManager extends ModuleManager {
                 mappedKeybindings.put(module, KeyMappingHelper.registerKeyMapping(new KeyMapping(
                                 module.getId().getPath(),
                                 InputConstants.Type.KEYBOARD,
-                                InputConstants.UNKNOWN.getValue(), category
+                                module.getKey(), category
                         )
                 ));
         }

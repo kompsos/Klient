@@ -9,6 +9,15 @@ import java.util.ArrayList;
 public class ExampleCommand extends Command {
     public ExampleCommand() {
         super(ModuleManager.ExecutorMode.SINGLE_MAIN, Klient.id("examplecommand"));
+
+        setDescription(
+                """
+                This is a general description of this command
+                    Hopefully you were not expecting something detailed lol.
+                   \s
+                    Yada Yada: examplecommand <argument> <argument>
+               \s"""
+        );
     }
 
     @Override
