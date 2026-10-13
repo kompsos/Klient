@@ -26,9 +26,7 @@ public class KlientConfig {
         boolean operatorState = false;
         boolean potionState = false;
         boolean flightState = false;
-        boolean positionState = false;
 
-        public boolean isPositionState() {return positionState;}
         public boolean isFlightState() {return flightState;}
         public boolean isPotionState() {return potionState;}
         public boolean isCreativeState() {return creativeState;}
