@@ -29,27 +29,6 @@ public class StateSystem extends Module {
         super(ModuleManager.ExecutorMode.MULTI, Klient.id("state_system"));
     }
 
-    public void onServerPosPacket(ClientboundPlayerPositionPacket packet, CallbackInfo ci) {
-        KlientConfig.Miscellaneous miscellaneousConfig = Klient.configLoader.getConfigObject().miscellaneous;
-        Minecraft instance = Minecraft.getInstance();
-
-        if (miscellaneousConfig.isPositionState() && instance.player != null) {
-            ci.cancel();
-
-
-            Vec3 pos = instance.player.position();
-            Vec3 serverPos = packet.change().position();
-
-            instance.getConnection().send(new ServerboundAcceptTeleportationPacket(packet.id(), serverPos.x, serverPos.y, serverPos.z, packet.change().xRot(), packet.change().yRot()));
-
-            if (pos.distanceTo(serverPos) >= 128) {
-                instance.getConnection().sendCommand(String.format("minecraft:tp %s %s %s %s", instance.player.getPlainTextName(), pos.x, pos.y, pos.z));
-            } else {
-                instance.player.setPos(pos);
-            }
-
-        }
-    }
 
     @Override
     public void onTick() {

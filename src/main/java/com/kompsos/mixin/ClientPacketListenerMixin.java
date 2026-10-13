@@ -15,9 +15,4 @@ public class ClientPacketListenerMixin {
     public void handleSystemChat(ClientboundSystemChatPacket packet, CallbackInfo ci) {
         Klient.LOGGER.info(packet.content().getString());
     }
-
-    @Inject(method = "handleMovePlayer", at = @At("HEAD"), cancellable = true)
-    private void onHandleMovePlayer(ClientboundPlayerPositionPacket packet, CallbackInfo ci) {
-        Klient.STATE_SYSTEM.onServerPosPacket(packet, ci);
-    }
 }
