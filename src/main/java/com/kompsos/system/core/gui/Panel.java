@@ -22,6 +22,11 @@ public class Panel extends AbstractWidget {
     private boolean grabbed;
     private int grabX, grabY;
 
+    /** True once MenuScreen has given this panel a position (or the user dragged it). */
+    boolean placed;
+    /** True once the user has dragged this panel; its position is then kept. */
+    boolean moved;
+
     public boolean draggable = true;
 
     public Panel(String title) {
@@ -38,6 +43,27 @@ public class Panel extends AbstractWidget {
     public void blur() {
         if (active != null) active.blur();
         active = null;
+    }
+
+    /** Panels owned by PanelToggle entries in this panel. */
+    List<Panel> linked() {
+        List<Panel> out = new ArrayList<>();
+        for (Entry entry : entries) {
+            if (entry instanceof Entry.PanelToggle t) out.add(t.panel());
+        }
+        return out;
+    }
+
+    /**
+     * Hides this panel and any panels it opened. A panel the user dragged keeps its
+     * position for next time; an undragged one gets a fresh free spot when shown again.
+     */
+    public void hide() {
+        blur();
+        grabbed = false;
+        visible = false;
+        if (!moved) placed = false;
+        for (Panel child : linked()) child.hide();
     }
 
     private int row() {
@@ -125,6 +151,8 @@ public class Panel extends AbstractWidget {
         } else if (draggable) {
             setX((int) event.x() - grabX);
             setY((int) event.y() - grabY);
+            moved = true;
+            placed = true;
         }
     }
 

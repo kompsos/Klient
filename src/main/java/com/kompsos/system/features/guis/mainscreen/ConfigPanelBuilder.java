@@ -1,10 +1,10 @@
-package com.kompsos.system.features.guis;
+package com.kompsos.system.features.guis.mainscreen;
 
 import com.google.gson.annotations.SerializedName;
+import com.kompsos.Klient;
 import com.kompsos.system.core.config.ConfigLoader;
 import com.kompsos.system.core.config.KlientConfig;
 import com.kompsos.system.core.gui.Entry;
-import com.kompsos.system.core.gui.MenuScreen;
 import com.kompsos.system.core.gui.Panel;
 
 import java.lang.reflect.Field;
@@ -14,21 +14,72 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-public class ConfigScreen extends MenuScreen {
+public class ConfigPanelBuilder {
 
-    public ConfigScreen(ConfigLoader loader) {
-        super(build(loader));
-    }
-
-    private static Panel[] build(ConfigLoader loader) {
+    /**
+     * Builds the panel for a single config category, e.g. {@code build(loader, "Commands")}.
+     * The category is matched against the section's JSON name or its field name, ignoring case.
+     * Sections nested inside the category become their own panels, opened through a
+     * {@link Entry.PanelToggle} entry.
+     *
+     * @return the panel, or null if there is no such category or it has nothing editable
+     */
+    public static Panel build(ConfigLoader loader, String category) {
         KlientConfig root = loader.getConfigObject();
-        List<Panel> panels = new ArrayList<>();
-        collect(loader, "Klient", root, panels);
-        return panels.toArray(new Panel[0]);
+
+        for (Field field : fieldsOf(root)) {
+            if (isLeaf(field.getType())) continue;
+            if (!matches(field, category)) continue;
+
+            try {
+                Object section = field.get(root);
+                return section == null ? null : panelFor(loader, nameOf(field), section);
+            } catch (IllegalAccessException e) {
+                Klient.LOGGER.error(e.getMessage());
+                return null;
+            }
+        }
+
+        return null;
     }
 
-    private static void collect(ConfigLoader loader, String title, Object target, List<Panel> out) {
+    /** Names of every category that {@link #build} accepts. */
+    public static List<String> categories(ConfigLoader loader) {
+        List<String> names = new ArrayList<>();
+        for (Field field : fieldsOf(loader.getConfigObject())) {
+            if (!isLeaf(field.getType())) names.add(nameOf(field));
+        }
+        return names;
+    }
+
+    private static Panel panelFor(ConfigLoader loader, String title, Object target) {
         List<Entry> entries = new ArrayList<>();
+
+        for (Field field : fieldsOf(target)) {
+            Class<?> type = field.getType();
+
+            try {
+                if (isLeaf(type)) {
+                    entries.add(entryFor(loader, target, field));
+                } else {
+                    Object child = field.get(target);
+                    if (child == null) continue;
+
+                    Panel childPanel = panelFor(loader, nameOf(field), child);
+                    if (childPanel != null) entries.add(new Entry.PanelToggle(nameOf(field), childPanel));
+                }
+            } catch (ReflectiveOperationException | RuntimeException e) {
+                Klient.LOGGER.error(e.getMessage());
+            }
+        }
+
+        if (entries.isEmpty()) return null;
+        return new Panel(title).add(entries.toArray(new Entry[0]));
+    }
+
+    /** Editable fields of an object: no statics, transients, arrays, collections, maps or enums. */
+    private static List<Field> fieldsOf(Object target) {
+        List<Field> out = new ArrayList<>();
 
         for (Field field : target.getClass().getDeclaredFields()) {
             int mod = field.getModifiers();
@@ -40,21 +91,17 @@ public class ConfigScreen extends MenuScreen {
 
             try {
                 field.setAccessible(true);
-
-                if (isLeaf(type)) {
-                    entries.add(entryFor(loader, target, field));
-                } else {
-                    Object child = field.get(target);
-                    if (child != null) collect(loader, nameOf(field), child, out);
-                }
-            } catch (ReflectiveOperationException | RuntimeException e) {
-                e.printStackTrace();
+                out.add(field);
+            } catch (RuntimeException e) {
+                Klient.LOGGER.error(e.getMessage());
             }
         }
 
-        if (!entries.isEmpty()) {
-            out.add(new Panel(title).add(entries.toArray(new Entry[0])));
-        }
+        return out;
+    }
+
+    private static boolean matches(Field field, String category) {
+        return nameOf(field).equalsIgnoreCase(category) || field.getName().equalsIgnoreCase(category);
     }
 
     private static boolean isLeaf(Class<?> t) {
@@ -74,9 +121,7 @@ public class ConfigScreen extends MenuScreen {
         if (type == boolean.class || type == Boolean.class) {
             return new Entry.Check(label,
                     () -> (boolean) read(target, field),
-                    v -> {
-                        write(loader, target, field, v);
-                    });
+                    v -> write(loader, target, field, v));
         }
 
         Entry.Input[] self = new Entry.Input[1];

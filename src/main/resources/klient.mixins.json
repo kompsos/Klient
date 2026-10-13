@@ -3,7 +3,8 @@
   "package": "com.kompsos.mixin",
   "compatibilityLevel": "JAVA_25",
   "mixins": [
-    "ChatScreenMixin"
+    "ChatScreenMixin",
+    "LevelMixin"
   ],
   "injectors": {
     "defaultRequire": 1

@@ -5,10 +5,13 @@ import com.kompsos.system.core.config.ConfigLoader;
 import com.kompsos.system.core.moduleloader.managers.CommandManager;
 import com.kompsos.system.core.moduleloader.managers.KeybindManager;
 import com.kompsos.system.core.moduleloader.managers.ModuleManager;
+import com.kompsos.system.core.systemmodules.CommandBlockMatrixSystem;
 import com.kompsos.system.core.systemmodules.NotificationSystem;
 import com.kompsos.system.core.systemmodules.StateSystem;
+import com.kompsos.system.features.commands.CoreTest;
 import com.kompsos.system.features.commands.ExampleCommand;
-import com.kompsos.system.features.keybinds.ConfigMenu;
+import com.kompsos.system.features.commands.SingleRun;
+import com.kompsos.system.features.keybinds.MainMenu;
 import com.kompsos.system.features.keybinds.OpenChatCommand;
 import net.fabricmc.api.ModInitializer;
 
@@ -30,18 +33,20 @@ public class Klient implements ModInitializer {
 
 	//Systems
 	public static final ChatSystem CHAT_SYSTEM = new ChatSystem();
+	public static final CommandBlockMatrixSystem COMMAND_BLOCK_MATRIX_SYSTEM = new CommandBlockMatrixSystem();
 	public static final NotificationSystem NOTIFICATION_SYSTEM = new NotificationSystem();
 	public static final StateSystem STATE_SYSTEM = new StateSystem();
 
 	//Managers
-	public static CommandManager commandManager = (CommandManager) new CommandManager(new ExampleCommand()).load();
-	public static KeybindManager keybindManager = (KeybindManager) new KeybindManager(new OpenChatCommand(), new ConfigMenu()).load();;
-	public static ModuleManager moduleManager = new ModuleManager(CHAT_SYSTEM, NOTIFICATION_SYSTEM, STATE_SYSTEM).load();
+	public static CommandManager commandManager = (CommandManager) new CommandManager(new ExampleCommand(), new SingleRun(), new CoreTest()).load();
 
 	@Override
 	public void onInitialize() {
 		LOGGER.info("Hello Kaboom!");
 		configLoader.load();
+
+		new ModuleManager(CHAT_SYSTEM, NOTIFICATION_SYSTEM, STATE_SYSTEM, COMMAND_BLOCK_MATRIX_SYSTEM).load();
+		new KeybindManager(new OpenChatCommand(), new MainMenu()).load();
 	}
 
 	public static Identifier id(String path) {

@@ -127,6 +127,41 @@ public abstract class Entry {
         }
     }
 
+    /**
+     * Toggles the visibility of a custom panel. The panel is hidden until the
+     * entry is clicked, and hidden again on the next click. Visible panels are
+     * laid out by {@link MenuScreen#relayout()} like every other panel.
+     */
+    public static class PanelToggle extends Entry {
+        private final Panel panel;
+
+        public PanelToggle(String label, Panel panel) {
+            super(label);
+            this.panel = panel;
+            panel.visible = false;
+        }
+
+        public Panel panel() {
+            return panel;
+        }
+
+        @Override
+        void render(GuiGraphicsExtractor g, int mx, int my) {
+            g.fill(x, y, x + w, y + h, panel.visible ? ON : OFF);
+            text(g, label);
+        }
+
+        @Override
+        void click(double mx, double my, int button) {
+            if (button > 1) return;
+
+            if (panel.visible) panel.hide();
+            else panel.visible = true;
+
+            if (Minecraft.getInstance().gui.screen() instanceof MenuScreen menu) menu.relayout();
+        }
+    }
+
     public static class Slider extends Entry {
         private final double min, max, def;
         private final DoubleConsumer onChange;

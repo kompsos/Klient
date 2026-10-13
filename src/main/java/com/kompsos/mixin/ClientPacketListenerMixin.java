@@ -13,6 +13,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class ClientPacketListenerMixin {
     @Inject(at = @At("HEAD"), method = "handleSystemChat", cancellable = true)
     public void handleSystemChat(ClientboundSystemChatPacket packet, CallbackInfo ci) {
-        Klient.LOGGER.info(packet.content().getString());
+        if ((Klient.COMMAND_BLOCK_MATRIX_SYSTEM.shouldHide(packet.content().getString()))) {
+            ci.cancel();
+        }
     }
 }
